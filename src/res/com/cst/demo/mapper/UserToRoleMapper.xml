@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cst.demo.dao.UserToRoleDao">
+	<select id="findUserRole" resultType="String" parameterType="String">
+		select
+		ur.role_id
+		from t_user_to_role ur
+		where ur.user_id = #{uid}
+	</select>
+
+	<insert id="saveRole" parameterType="com.cst.demo.po.UserToRole">
+		insert into
+		t_user_to_role r(
+		r.relation_id,
+		r.user_id,
+		r.role_id
+		)
+		values(
+		seq_utr_id.nextval,
+		seq_user_id.currval,
+		#{role_id}
+		)
+	</insert>
+
+	<!-- 更新用户 角色 -->
+	<update id="updateRole" parameterType="com.cst.demo.po.UserToRole">
+		update t_user_to_role
+		set
+		role_id = #{role_id}
+		where user_id=#{user_id}
+	</update>
+
+
+	<delete id="deleteUserRole" parameterType="String">
+		delete from t_user_to_role where
+		<foreach collection="array" item="uid" open="" close="" separator="OR">
+			user_id=#{uid}
+		</foreach>
+	</delete>
+
+</mapper>    

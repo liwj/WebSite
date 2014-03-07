@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cst.demo.dao.DeptDao">
+	<insert id="saveDept" parameterType="com.cst.demo.po.Dept">
+		insert into t_dept (
+		dept_id,dept_name,super_dept,region,dept_appr,linkman,mobile,tel,email,updateuserid
+		)
+		values (
+		seq_dept_id.nextval,
+		#{dept_name},
+		#{super_dept},
+		#{region},
+		#{dept_appr},
+		#{linkman},
+		#{mobile},
+		#{tel},
+		#{email},
+		#{updateuserid} )
+	</insert>
+	<delete id="deleteDept">
+		delete from t_dept d
+		where
+		<foreach collection="array" item="uid" open="" close=""
+			separator="OR">
+			d.dept_id=#{uid}
+		</foreach>
+	</delete>
+	<select id="findDeptById" resultType="com.cst.demo.po.Dept"
+		parameterType="int">
+		select dept_id, dept_name,
+		(select t.dept_name from
+		t_dept t where d.super_dept=t.dept_id) as superName,
+		d.super_dept,
+		region, dept_appr, linkman, tel, mobile, email,
+		nvl2(updateuserid,(select i.user_name from t_user_info i where
+		d.updateuserid
+		=i.user_id),'无更新人') as updateName, d.updateuserid,
+		updatetime from t_dept d where dept_id=#{deptId}
+	</select>
+	<update id="updateDept" parameterType="com.cst.demo.po.Dept">
+		update t_dept d set
+		d.dept_name = #{dept_name},
+		d.super_dept = #{super_dept},
+		d.region = #{region},
+		d.dept_appr = #{dept_appr},
+		d.linkman = #{linkman},
+		d.mobile = #{mobile},
+		d.tel = #{tel},
+		d.email = #{email},
+		d.updateuserid = #{updateuserid},
+		d.updatetime = #{updatetime}
+		where d.dept_id = #{dept_id}
+
+	</update>
+
+	<!-- 根据部门的父级id查询子级部门信息 -->
+	<select id="findDeptBySuper" resultType="com.cst.demo.po.Dept">
+		select dept_id,
+		dept_name,
+		(select t.dept_name from t_dept t where
+		d.super_dept=t.dept_id) as superName,
+		d.super_dept,
+		region, dept_appr,
+		linkman, tel, mobile, email,
+		nvl2(updateuserid,(select i.user_name from
+		t_user_info i where d.updateuserid
+		=i.user_id),'无更新人') as updateName,
+		d.updateuserid,
+		updatetime from t_dept d where super_dept=#{super_dept}
+
+	</select>
+
+	<!-- 查询部门信息的条数 -->
+	<select id="findDeptCount" resultType="int">
+		select count(1) from
+		t_dept
+	</select>
+	<!-- 分页查询部门信息 -->
+	<select id="findDept" resultType="com.cst.demo.po.Dept">
+		select a.* from(select rownum
+		as r,t.dept_id,t. dept_name,(select dept_name from t_dept where
+		dept_id=t.super_dept) as
+		superName,region,dept_appr,linkman,mobile,tel,email,updateuserid,updatetime
+		from t_dept t) a where a.r &lt;= #{startResult}
+		and a.r &gt; #{endResult} order by dept_id
+	</select>
+	
+	<select id="findDepts" resultType="com.cst.demo.po.Dept">
+		select * from t_dept order by dept_id
+	</select>
+
+</mapper>    

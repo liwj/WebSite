@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cst.demo.dao.MenuDao">
+	<!-- 访问父级菜单ID访问子菜单 -->
+	<select id="findSub" resultType="com.cst.demo.po.Menu">
+		select * from t_menu where menu_super_id=#{menu_id}
+	</select>
+	<!-- 获取所有菜单 -->
+	<select id="findAll" resultType="com.cst.demo.po.Menu">
+		select * from t_menu
+	</select>
+	<!-- 根据用户角色ID查询所属菜单权限 -->
+	<select id="findMenuByRole" resultType="com.cst.demo.po.Menu">
+		select distinct 
+			m.menu_id,
+			m.menu_name,
+			m.menu_url,
+			m.menu_super_id,
+			m.menu_img,
+			m.menu_index,
+			m.menu_report
+		from 
+			t_menu m,t_ro_me_bu r 
+		where 
+			m.menu_id = r.menu_id  
+		and 
+			r.role_id=#{roleId}
+		order by m.menu_id	
+	</select>
+</mapper>    

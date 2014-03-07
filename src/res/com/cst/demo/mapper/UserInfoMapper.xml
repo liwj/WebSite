@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cst.demo.dao.UserInfoDao">
+	<!-- 访问用户信息(包括用户部门等信息) -->
+	<select id="findAllUser" resultType="com.cst.demo.util.UserInfoBean">
+		select
+		u.user_id,
+		u.login_name,
+		u.user_isonline,
+		u.user_password,
+		i.user_name,
+		i.user_mobile,
+		i.user_email,
+		i.user_tel,
+		d.super_dept,
+		d.dept_id,
+		d.dept_name
+		from
+		t_user u,
+		t_user_info i,
+		t_dept d
+		where
+		u.user_id=i.user_id
+		and
+		i.dept_id=d.dept_id
+		order by u.user_id
+	</select>
+	<!-- 访问用户信息(包括用户部门等信息。单条) -->
+	<select id="findUserData" resultType="com.cst.demo.util.UserInfoBean">
+		select
+		u.user_id,
+		u.login_name,
+		u.user_isonline,
+		u.user_password,
+		i.user_name,
+		i.user_mobile,
+		i.user_email,
+		i.user_tel,
+		d.super_dept,
+		d.dept_id,
+		d.dept_name
+		from
+		t_user u,
+		t_user_info i,
+		t_dept d
+		where
+		u.user_id=i.user_id
+		and
+		i.dept_id=d.dept_id
+		and
+		i.user_id=#{uid}
+		order by u.user_id
+	</select>
+	<!-- 添加用户 -->
+	<insert id="saveUserInfo" parameterType="com.cst.demo.po.UserInfo">
+		insert into t_user_info(
+		userinfo_id,
+		user_id,
+		user_name,
+		user_mobile,
+		user_tel,
+		user_email,
+		dept_id
+		)values(
+		seq_userinfo_id.nextval,
+		seq_user_id.currval,
+		#{user_name},
+		#{user_mobile},
+		#{user_tel},
+		#{user_email},
+		#{dept_id}
+		)
+	</insert>
+
+	<!-- 按用户ID删除用户基本信息 -->
+	<delete id="deleteUserInfo" parameterType="String">
+		delete from t_user_info i where
+		<foreach collection="array" item="uid" open="" close=""
+			separator="OR">
+			i.user_id=#{uid}
+		</foreach>
+	</delete>
+	<update id="updateUserInfo" parameterType="com.cst.demo.po.UserInfo">
+		update
+			t_user_info 
+		set
+			user_name = #{user_name},
+			user_email = #{user_email},
+			user_tel = #{user_tel},
+			user_mobile = #{user_mobile},
+			dept_id = #{dept_id},
+			updateuserid = #{updateuserid},
+			updatetime = #{updatetime}
+		where
+		user_id = #{user_id}
+	</update>
+
+</mapper>    

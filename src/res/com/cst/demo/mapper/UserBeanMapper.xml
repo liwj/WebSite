@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 用户查询用户信息的BEAN,其中包括用户部门、角色、基本信息等 -->
+<mapper namespace="com.cst.demo.dao.UserBeanDao">
+	<!-- 根据用户ID查询用户信息 -->
+	<select id="findUserBean" resultType="com.cst.demo.util.UserInfoBean"
+		parameterType="String">
+		select
+		i.userinfo_id,nvl2(i.dept_id,(select d.dept_name
+		from t_dept d where
+		d.dept_id=i.dept_id),'游民') as dept_name ,
+		i.user_name,i.user_mobile,i.user_tel,i.user_email,
+		nvl2(i.updateuserid, (select ui.user_name from t_user_info ui where
+		ui.user_id = i.updateuserid) ,'无人更新') as
+		update_name,i.updateuserid,i.updatetime,
+		u.user_id,u.login_name,u.user_disabled,u.user_isonline,u.user_password,
+		t.role_name,t.role_id,i.dept_id
+		from t_user_info i,t_user
+		u,t_user_to_role r,t_role t
+		where u.user_id=i.user_id and r.role_id =
+		t.role_id and u.user_id =
+		r.user_id and u.user_id=#{userId}
+		order by
+		u.user_id
+	</select>
+	<!-- 查询所有用户信息 -->
+	<!-- <select id="findAllUserBean" resultType="com.cst.demo.util.UserInfoBean">
+		select
+		i.userinfo_id,
+		nvl2(i.dept_id,(select d.dept_name from t_dept d where d.dept_id=i.dept_id),'游民') as
+		dept_name ,
+		i.user_name,i.user_mobile,i.user_tel,i.user_email,i.updateuserid,
+		nvl2(i.updateuserid, (select ui.user_name from t_user_info ui where
+		ui.user_id = i.updateuserid) ,'无人更新') as update_name,i.updatetime,
+		u.user_id,u.login_name,u.user_disabled,u.user_isonline,u.user_password,t.role_name,t.role_id,i.dept_id
+		from
+		t_user_info i,t_user u,t_user_to_role r,t_role t
+		where
+		u.user_id=i.user_id and r.role_id = t.role_id and u.user_id = r.user_id
+		order by u.user_id
+	</select> -->
+
+	<!--分页查询用户信息 -->
+	<select id="findAllUserBean" resultType="com.cst.demo.util.UserInfoBean">
+		select a.* from(
+			select rownum as r,
+				i.userinfo_id,
+				nvl2(i.dept_id,(select d.dept_name from t_dept d where d.dept_id=i.dept_id),'游民') as
+				dept_name ,i.user_name,i.user_mobile,i.user_tel,i.user_email,i.updateuserid,
+				nvl2(i.updateuserid, (select ui.user_name from t_user_info ui where
+				ui.user_id = i.updateuserid) ,'无人更新') as update_name,i.updatetime,
+				u.user_id,u.login_name,u.user_disabled,u.user_isonline,u.user_password,t.role_name,t.role_id,i.dept_id
+			from t_user_info i,t_user u,t_user_to_role r,t_role t 
+			where u.user_id=i.user_id and r.role_id = t.role_id and u.user_id = r.user_id ) a 
+		where a.r &lt;= #{startResult} and a.r &gt; #{endResult} 
+		order by a.user_id
+	</select>
+
+	<select id="findUserCount" resultType="int">
+		select count(*) from t_user
+	</select>
+
+
+</mapper>    
